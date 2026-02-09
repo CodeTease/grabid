@@ -160,11 +160,11 @@ const Home = () => {
       setStatus('SUCCESS');
       setTimeout(() => setStatus('IDLE'), 3000); // Reset after 3s
 
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') {
         setStatus('IDLE');
       } else {
-        setError(err.message || 'Unknown error occurred');
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
         setStatus('ERROR');
       }
     }
