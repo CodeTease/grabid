@@ -29,4 +29,13 @@ go.work.sum
 
 # Editor/IDE
 # .idea/
-# .vscode/
+.vscode/
+
+node_modules
+
+# Vegh Snapshot Tool. A CodeTease project
+*.vegh
+.veghcache/
+
+# Pavidi Task Runner. A CodeTease project
+.p/

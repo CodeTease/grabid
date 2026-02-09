@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  grabid-backend:
+    build:
+      context: ./grabid-backend
+    container_name: grabid-backend
+    environment:
+      - PORT=8080
+      - GRAB_SECRET=${GRAB_SECRET}
+    restart: unless-stopped
+    networks:
+      - grabid-net
+
+  grabid-frontend:
+    build:
+      context: ./grabid-frontend
+    container_name: grabid-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - grabid-backend
+    networks:
+      - grabid-net
+
+networks:
+  grabid-net:
+    driver: bridge
