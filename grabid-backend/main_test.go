@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"golang.org/x/time/rate"
 )
 
 func TestAuthMiddleware(t *testing.T) {
@@ -57,6 +59,53 @@ func TestAuthMiddleware(t *testing.T) {
 
 			if w.Code != tt.expectedStatus {
 				t.Errorf("expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+		})
+	}
+}
+
+func TestParseSize(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"1GB", 1024 * 1024 * 1024},
+		{"500MB", 500 * 1024 * 1024},
+		{"1KB", 1024},
+		{"1024B", 1024},
+		{"100", 100}, // Defaults to bytes if no suffix? My implementation treats it as bytes if just number, or maybe not.
+		// Let's check logic: if no suffix matches, it tries ParseInt on the string.
+		{"", 1024 * 1024 * 1024}, // Default
+		{"INVALID", 1024 * 1024 * 1024}, // Default on error
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := ParseSize(tt.input)
+			if got != tt.expected {
+				t.Errorf("ParseSize(%q) = %d; want %d", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestParseRateLimit(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedLimit rate.Limit
+		expectedBurst int
+	}{
+		{"1-5", 1, 5},
+		{"10-20", 10, 20},
+		{"invalid", 1, 5}, // Default
+		{"", 1, 5}, // Default
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			l, b := ParseRateLimit(tt.input)
+			if l != tt.expectedLimit || b != tt.expectedBurst {
+				t.Errorf("ParseRateLimit(%q) = %v, %d; want %v, %d", tt.input, l, b, tt.expectedLimit, tt.expectedBurst)
 			}
 		})
 	}

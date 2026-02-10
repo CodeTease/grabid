@@ -59,10 +59,30 @@ const Home = () => {
   const [progress, setProgress] = useState(0);
   const [speed, setSpeed] = useState('0 KB/s');
   const [eta, setEta] = useState('--');
+  const [maxSizeLimit, setMaxSizeLimit] = useState<string>('');
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     localStorage.setItem('grabid_token', token);
+  }, [token]);
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      try {
+        const res = await fetch('/api/v1/info', {
+           headers: { 'X-Grab-Token': token },
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.max_size_limit) {
+                setMaxSizeLimit(data.max_size_limit);
+            }
+        }
+      } catch (e) {
+        console.error("Failed to fetch info", e);
+      }
+    };
+    fetchInfo();
   }, [token]);
 
   const handleDownload = async (e: React.FormEvent) => {
@@ -98,7 +118,16 @@ const Home = () => {
         signal: abortControllerRef.current.signal,
       });
 
-      if (!response.ok) throw new Error(`Stream failed: ${response.status}`);
+      if (!response.ok) {
+         if (response.status === 413) {
+             throw new Error(`File vượt quá giới hạn cho phép (Max: ${maxSizeLimit || 'Unknown'})`);
+         } else if (response.status === 429) {
+             throw new Error("Bạn thao tác quá nhanh. Vui lòng thử lại sau vài giây.");
+         } else if (response.status === 503) {
+             throw new Error("Server đang bận (Full slots). Vui lòng đợi người khác tải xong.");
+         }
+         throw new Error(`Stream failed: ${response.status}`);
+      }
       if (!response.body) throw new Error('ReadableStream not supported');
 
       const reader = response.body.getReader();
@@ -213,6 +242,12 @@ const Home = () => {
             </button>
           )}
         </div>
+        
+        {maxSizeLimit && (
+            <div className="text-gray-500 text-sm text-center">
+                Max Size Limit: {maxSizeLimit}
+            </div>
+        )}
 
         {/* Token Input (Collapsible or just visible) */}
         <div className="flex justify-end">
