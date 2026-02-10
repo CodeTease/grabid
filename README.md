@@ -38,6 +38,17 @@ The application can be configured using environment variables. You can set these
 | :--- | :--- | :--- |
 | `PORT` | The port on which the backend service runs. | `8080` |
 | `GRAB_SECRET` | Secret token for authentication. If set, requests must include `X-Grab-Token` header. | (Empty/Public) |
+| `GRAB_MAX_SIZE` | Maximum file size to stream (e.g. 1GB, 500MB). | `1GB` |
+| `GRAB_MAX_CONCURRENT` | Maximum concurrent stream requests. | `5` |
+| `GRAB_RATE_LIMIT` | Rate limit per IP (requests-burst). | `1-5` |
+
+### Frontend Development
+
+For local development (`npm run dev`), the frontend can be configured:
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | The URL of the backend API for proxying requests. | `http://localhost:8080` |
 
 ## API Endpoints
 
