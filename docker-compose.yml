@@ -8,9 +8,9 @@ services:
     environment:
       - PORT=8080
       - GRAB_SECRET=${GRAB_SECRET}
-      - GRAB_MAX_SIZE=1GB
-      - GRAB_MAX_CONCURRENT=5
-      - GRAB_RATE_LIMIT=1-5
+      - GRAB_MAX_SIZE=${GRAB_MAX_SIZE:-1GB}
+      - GRAB_MAX_CONCURRENT=${GRAB_MAX_CONCURRENT:-5}
+      - GRAB_RATE_LIMIT=${GRAB_RATE_LIMIT:-1-5}
     restart: unless-stopped
     networks:
       - grabid-net
