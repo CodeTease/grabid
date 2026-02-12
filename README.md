@@ -30,6 +30,34 @@ Grabid is a utility service for grabbing and streaming content from URLs. It con
 3.  **Access the application:**
     Open your browser and navigate to `http://localhost`.
 
+## Running with Docker from GHCR
+
+You can also run the application directly from the GitHub Container Registry without cloning the repository.
+
+1.  **Create a Docker network:**
+    ```bash
+    docker network create grabid-net
+    ```
+
+2.  **Start the backend:**
+    ```bash
+    docker run -d \
+      --name grabid-backend \
+      --network grabid-net \
+      -p 8080:8080 \
+      -e GRAB_SECRET=your_secret \
+      ghcr.io/codetease/grabid-backend:latest
+    ```
+
+3.  **Start the frontend:**
+    ```bash
+    docker run -d \
+      --name grabid-frontend \
+      --network grabid-net \
+      -p 80:80 \
+      ghcr.io/codetease/grabid-frontend:latest
+    ```
+
 ## Configuration
 
 The application can be configured using environment variables. You can set these in the `docker-compose.yml` file or in a `.env` file.
