@@ -298,11 +298,6 @@ func handleStream(w http.ResponseWriter, r *http.Request, cfg Config, sem chan s
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		http.Error(w, fmt.Sprintf("Source returned error: %d", resp.StatusCode), http.StatusBadGateway)
-		return
-	}
-
 	// Size Check (Header)
 	if resp.ContentLength > cfg.MaxSize {
 		http.Error(w, "Payload Too Large", http.StatusRequestEntityTooLarge)
@@ -327,6 +322,8 @@ func handleStream(w http.ResponseWriter, r *http.Request, cfg Config, sem chan s
 			}
 		}
 	}
+
+	w.WriteHeader(resp.StatusCode)
 
 	// Streamer Engine with LimitReader
 	limitedBody := io.LimitReader(resp.Body, cfg.MaxSize)
