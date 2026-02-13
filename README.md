@@ -18,7 +18,7 @@ Grabid is a utility service for grabbing and streaming content from URLs. It con
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/grabid.git
+    git clone https://github.com/CodeTease/grabid.git
     cd grabid
     ```
 
